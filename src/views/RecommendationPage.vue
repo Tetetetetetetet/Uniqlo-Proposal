@@ -1,6 +1,32 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { PRODUCT_IMAGES } from '../constants/imageUrls'
+import OrderPanel from '../components/OrderPanel.vue'
+
+// 点单面板状态
+const isOrderPanelVisible = ref(false)
+const selectedProduct = ref({
+  id: '',
+  name: '',
+})
+
+// 打开点单面板
+const openOrderPanel = (product: { id: string; name: string }) => {
+  selectedProduct.value = product
+  isOrderPanelVisible.value = true
+}
+
+// 关闭点单面板
+const closeOrderPanel = () => {
+  isOrderPanelVisible.value = false
+}
+
+// 提交订单
+const handleOrderSubmit = () => {
+  // TODO: 实现订单提交逻辑
+  console.log('提交订单:', selectedProduct.value)
+  closeOrderPanel()
+}
 
 // 商品统计数据
 const productStats = ref({
@@ -23,20 +49,20 @@ const mainProduct = ref({
 
 // 搭配推荐商品
 const matchRecommendations = ref([
-  { id: 1, imageUrl: PRODUCT_IMAGES.matching.match001, name: 'Perfect Match 1' },
-  { id: 2, imageUrl: PRODUCT_IMAGES.matching.match002, name: 'Perfect Match 2' },
-  { id: 3, imageUrl: PRODUCT_IMAGES.matching.match003, name: 'Perfect Match 3' },
-  { id: 4, imageUrl: PRODUCT_IMAGES.matching.match004, name: 'Perfect Match 4' },
-  { id: 5, imageUrl: PRODUCT_IMAGES.matching.match001, name: 'Perfect Match 5' }, // 临时使用match001作为第五张图
+  { id: 'M001', imageUrl: PRODUCT_IMAGES.matching.match001, name: 'Perfect Match 1' },
+  { id: 'M002', imageUrl: PRODUCT_IMAGES.matching.match002, name: 'Perfect Match 2' },
+  { id: 'M003', imageUrl: PRODUCT_IMAGES.matching.match003, name: 'Perfect Match 3' },
+  { id: 'M004', imageUrl: PRODUCT_IMAGES.matching.match004, name: 'Perfect Match 4' },
+  { id: 'M005', imageUrl: PRODUCT_IMAGES.matching.match001, name: 'Perfect Match 5' }, // 临时使用match001作为第五张图
 ])
 
 // 相似商品推荐
 const similarRecommendations = ref([
-  { id: 1, imageUrl: PRODUCT_IMAGES.similar.similar001, name: 'Similar Style 1' },
-  { id: 2, imageUrl: PRODUCT_IMAGES.similar.similar002, name: 'Similar Style 2' },
-  { id: 3, imageUrl: PRODUCT_IMAGES.similar.similar003, name: 'Similar Style 3' },
-  { id: 4, imageUrl: PRODUCT_IMAGES.similar.similar004, name: 'Similar Style 4' },
-  { id: 5, imageUrl: PRODUCT_IMAGES.similar.similar005, name: 'Similar Style 5' },
+  { id: 'S001', imageUrl: PRODUCT_IMAGES.similar.similar001, name: 'Similar Style 1' },
+  { id: 'S002', imageUrl: PRODUCT_IMAGES.similar.similar002, name: 'Similar Style 2' },
+  { id: 'S003', imageUrl: PRODUCT_IMAGES.similar.similar003, name: 'Similar Style 3' },
+  { id: 'S004', imageUrl: PRODUCT_IMAGES.similar.similar004, name: 'Similar Style 4' },
+  { id: 'S005', imageUrl: PRODUCT_IMAGES.similar.similar005, name: 'Similar Style 5' },
 ])
 
 // 刷新搭配推荐列表
@@ -65,11 +91,14 @@ const updateProductStats = () => {
       <div class="col-span-4">
         <div class="sticky top-8">
           <div class="bg-white p-4 rounded-lg shadow-sm">
-            <div class="aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-50 mb-4">
+            <div
+              class="aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-50 mb-4 cursor-pointer"
+              @click="openOrderPanel(mainProduct)"
+            >
               <img
                 :src="mainProduct.imageUrl"
                 :alt="mainProduct.name"
-                class="w-full h-full object-contain"
+                class="w-full h-full object-contain hover:opacity-75 transition-opacity"
               />
             </div>
             <h2 class="text-xl font-semibold text-gray-900">{{ mainProduct.name }}</h2>
@@ -110,8 +139,13 @@ const updateProductStats = () => {
             </button>
           </div>
           <div class="grid grid-cols-3 gap-6">
-            <div v-for="item in matchRecommendations" :key="item.id" class="group cursor-pointer">
-              <div class="product-card">
+            <div
+              v-for="item in matchRecommendations"
+              :key="item.id"
+              class="group cursor-pointer"
+              @click="openOrderPanel(item)"
+            >
+              <div class="product-card cursor-pointer" @click="openOrderPanel(item)">
                 <div class="aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-50">
                   <img
                     :src="item.imageUrl"
@@ -137,8 +171,13 @@ const updateProductStats = () => {
             </button>
           </div>
           <div class="grid grid-cols-3 gap-6">
-            <div v-for="item in similarRecommendations" :key="item.id" class="group cursor-pointer">
-              <div class="product-card">
+            <div
+              v-for="item in similarRecommendations"
+              :key="item.id"
+              class="group cursor-pointer"
+              @click="openOrderPanel(item)"
+            >
+              <div class="product-card cursor-pointer" @click="openOrderPanel(item)">
                 <div class="aspect-[3/4] w-full overflow-hidden rounded-lg bg-gray-50">
                   <img
                     :src="item.imageUrl"
@@ -153,6 +192,14 @@ const updateProductStats = () => {
         </div>
       </div>
     </div>
+    <!-- 点单面板 -->
+    <OrderPanel
+      :is-visible="isOrderPanelVisible"
+      :product-name="selectedProduct.name"
+      :product-id="selectedProduct.id"
+      @close="closeOrderPanel"
+      @submit="handleOrderSubmit"
+    />
   </div>
 </template>
 
