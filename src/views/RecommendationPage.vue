@@ -2,16 +2,17 @@
 import { ref } from 'vue'
 import { PRODUCT_IMAGES } from '../constants/imageUrls'
 
-// 情绪价值话术列表
-const emotionTexts = [
-  'Wow! These jeans are very hot now, good taste!',
-  'Amazing choice! These jeans are trending among fashion lovers!',
-  'Great eye! This item has been popular among our stylish customers!',
-  'Perfect pick! These jeans are getting lots of attention lately!',
-]
+// 商品统计数据
+const productStats = ref({
+  weeklyPurchases: 328,
+  monthlyPurchases: 1247,
+  weeklyTryons: 892,
+  monthlyTryons: 3156,
+})
 
-// 当前显示的情绪话术
-const currentEmotionText = ref(emotionTexts[0])
+// 情绪价值话术（包含实际数据）
+const emotionText = ref(`这款牛仔裤本月已有${productStats.value.monthlyPurchases}位顾客购买！
+本周${productStats.value.weeklyTryons}人试穿后给出好评，快来体验吧！`)
 
 // 主商品展示
 const mainProduct = ref({
@@ -50,11 +51,11 @@ const refreshSimilarRecommendations = () => {
   console.log('Refreshing similar recommendations')
 }
 
-// 定期更换情绪话术
-setInterval(() => {
-  const randomIndex = Math.floor(Math.random() * emotionTexts.length)
-  currentEmotionText.value = emotionTexts[randomIndex]
-}, 5000)
+// 更新商品统计数据的方法
+const updateProductStats = () => {
+  // TODO: 这里可以添加API调用来获取实时数据
+  console.log('Updating product stats...')
+}
 </script>
 
 <template>
@@ -79,10 +80,22 @@ setInterval(() => {
       <!-- 右侧推荐部分 -->
       <div class="col-span-8 space-y-8">
         <!-- 情绪价值话术部分 -->
-        <div>
-          <h1 class="text-2xl font-bold text-center text-gray-900 animate-fade-in">
-            {{ currentEmotionText }}
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+          <h1 class="text-2xl font-bold text-gray-900 mb-4">
+            {{ emotionText }}
           </h1>
+          <div class="grid grid-cols-2 gap-4 text-center">
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-lg font-semibold text-gray-900">本月购买</p>
+              <p class="text-3xl font-bold text-blue-600">{{ productStats.monthlyPurchases }}</p>
+              <p class="text-sm text-gray-500">位顾客选择</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="text-lg font-semibold text-gray-900">本周试穿</p>
+              <p class="text-3xl font-bold text-green-600">{{ productStats.weeklyTryons }}</p>
+              <p class="text-sm text-gray-500">人好评体验</p>
+            </div>
+          </div>
         </div>
 
         <!-- 搭配推荐部分 -->
